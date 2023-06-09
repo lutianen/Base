@@ -18,9 +18,9 @@ namespace base {
 #define PONG(x)                                                             \
     std::cout << #x ": "                                                    \
               << std::chrono::duration_cast<std::chrono::duration<double>>( \
-                         std::chrono::steady_clock::now() - bench_##x)      \
-                         .count()                                           \
+                     std::chrono::steady_clock::now() - bench_##x)          \
+                     .count()                                               \
               << "s" << std::endl;
 
-}// namespace base
-}// namespace lux
+}  // namespace base
+}  // namespace lux
