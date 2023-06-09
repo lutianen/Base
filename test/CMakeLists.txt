@@ -9,4 +9,12 @@ target_link_libraries(MTQueue luxbase)
 add_executable(exception exception_test.cc)
 target_link_libraries(exception luxbase)
 
+add_executable(mutex mutex_test.cc)
+target_link_libraries(mutex luxbase)
+
+add_executable(currentThread currentThread_test.cc)
+target_link_libraries(currentThread luxbase)
+
+add_executable(thread thread_test.cc)
+target_link_libraries(thread luxbase)
 

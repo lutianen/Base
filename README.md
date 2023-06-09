@@ -25,3 +25,15 @@ gcc >= 4.7
 - Condition
 
   `A simple condition class.`
+
+- CountDownLatch
+
+   `A simple CountDownLatch class.`
+
+- CurrentThread
+
+   `A simple CurrentThread class.`
+
+- Thread
+
+   `A simple Thread class.`
