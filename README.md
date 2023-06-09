@@ -1,5 +1,7 @@
 # LuxBase
 
+gcc >= 4.7
+
 **C++小工具集合**
 
 - mallochook
@@ -11,3 +13,7 @@
 - MTQueue
 
    `A Thread-Safe queue.`
+
+- Execption
+
+  `A simple exception class.`

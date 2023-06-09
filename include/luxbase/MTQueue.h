@@ -17,6 +17,8 @@
     tconsumer.join();
  */
 
+#pragma once
+
 #include <condition_variable>
 #include <mutex>
 #include <vector>
