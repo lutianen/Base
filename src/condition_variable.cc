@@ -3,9 +3,6 @@
 #include <iostream>
 
 bool lux::base::Condition::waitForSeconds(double seconds) {
-    struct timespec abstime;
-
-    // FIXME: use CLOCK_MONOTONIC or CLOCK_MONOTONIC_RAW to prevent time rewind.
     /**
      * 在 Linux 系统中，有多种时钟可以用来获取时间信息:
      *      CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_MONOTIC_RAW 等
@@ -18,17 +15,12 @@ bool lux::base::Condition::waitForSeconds(double seconds) {
         CLOCK_MONOTONIC 时钟可能会受到时间调整的影响（例如 NTP 校时），
         CLOCK_MONOTONIC_RAW 时钟则不受影响
      */
-    ::clock_gettime(CLOCK_REALTIME, &abstime);
-
-    timespec ts;
+    struct timespec abstime;
 #ifdef CLOCK_MONOTONIC_RAW
-    ::clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    ::clock_gettime(CLOCK_MONOTONIC_RAW, &abstime);
 #else
-    ::clock_gettime(CLOCK_MONOTONIC, &ts);
+    ::clock_gettime(CLOCK_MONOTONIC, &abstime);
 #endif
-
-    std::cout << abstime.tv_sec << ", " << abstime.tv_nsec << ", " << ts.tv_sec
-              << ", " << ts.tv_nsec << std::endl;
 
     const int64_t kNanoSecondsPerSecond = 1E9;
     int64_t nanoseconds = static_cast<int64_t>(seconds * kNanoSecondsPerSecond);
