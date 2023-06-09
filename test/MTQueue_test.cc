@@ -1,13 +1,12 @@
 #include <luxbase/MTQueue.h>
 #include <luxbase/pingpong.h>
 
+#include <atomic>
 #include <iostream>
-#include <mutex>
 #include <thread>
 
-int count = 0;
+std::atomic_int count(0);
 lux::base::MTQueue<int> que;
-std::mutex mtx;
 
 int main() {
     int c = 0;
@@ -16,19 +15,13 @@ int main() {
         std::thread tproducer([]() {
             for (int i = 0; i < 100; ++i) {
                 que.push(i);
-                {
-                    std::unique_lock<std::mutex> lock(mtx);
-                    count++;
-                }
+                count.fetch_add(1);
             }
         });
         std::thread tconsumer([]() {
             for (int i = 0; i < 100; ++i) {
                 que.pop();
-                {
-                    std::unique_lock<std::mutex> lock(mtx);
-                    count--;
-                }
+                count.fetch_sub(1);
             }
         });
 
