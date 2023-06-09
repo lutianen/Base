@@ -17,3 +17,11 @@ gcc >= 4.7
 - Execption
 
   `A simple exception class.`
+
+- MutexLock
+
+  `A simple mutex lock class.`
+
+- Condition
+
+  `A simple condition class.`
