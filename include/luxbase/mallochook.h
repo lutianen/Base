@@ -9,20 +9,21 @@
  */
 
 #pragma once
-namespace lux {
-namespace utils {
+
 #ifdef __unix__
 
 #include <dlfcn.h>
 #include <stdio.h>
 
+namespace lux {
+namespace base {
 /**
 * @brief
 *
 * @param size
 * @return void*
 */
-void *malloc(size_t size) {
+inline void *malloc(size_t size) {
     typedef void *(*malloc_t)(size_t size);
     static malloc_t malloc_fn = (malloc_t) dlsym(RTLD_NEXT, "malloc");
     void *p = malloc_fn(size);
@@ -35,7 +36,7 @@ void *malloc(size_t size) {
 *
 * @param ptr
 */
-void free(void *ptr) {
+inline void free(void *ptr) {
     typedef void (*free_t)(void *ptr);
     static free_t free_fn = (free_t) dlsym(RTLD_NEXT, "free");
     fprintf(stderr, "\033[31mfree(%p)\033[0m\n", ptr);
