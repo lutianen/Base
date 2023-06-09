@@ -7,3 +7,7 @@
 - pingpong
 
    `Simple macro to measure time of execution of a piece of code`
+
+- MTQueue
+
+   `A Thread-Safe queue.`
