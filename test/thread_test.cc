@@ -2,6 +2,7 @@
 #include <luxbase/pingpong.h>
 #include <luxbase/thread.h>
 #include <unistd.h>
+#include <thread>
 
 void mysleep(int seconds) {
     timespec t = {seconds, 0};
@@ -75,4 +76,9 @@ int main() {
     }
     sleep(2);
     printf("number of created threads %d\n", lux::base::Thread::numCreated());
+
+    // std::cout << static_cast<pid_t>(std::this_thread::get_id()) << std::endl;
+    std::cout << "getpid() - " << getpid() << std::endl;
+    std::cout << "std::this_thread::get_id() - " << std::this_thread::get_id() << std::endl;
+    std::cout << "pthread_self() - " << pthread_self() << std::endl;
 }
