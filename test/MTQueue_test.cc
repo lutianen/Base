@@ -1,5 +1,5 @@
 #include <luxbase/MTQueue.h>
-#include <luxbase/pingpong.h>
+#include <luxbase/utils.h>
 
 #include <atomic>
 #include <iostream>

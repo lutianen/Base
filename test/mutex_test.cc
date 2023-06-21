@@ -1,7 +1,7 @@
 #include <luxbase/condition_variable.h>
 #include <luxbase/mutex.h>
 #include <luxbase/thread.h>
-#include <luxbase/pingpong.h>
+#include <luxbase/utils.h>
 
 #include <vector>
 
