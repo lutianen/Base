@@ -28,7 +28,7 @@ namespace base {
 
     /**
      * @brief A thread-safe queue
-     * 
+     *
      * @tparam T The type of the elements
      */
     template <typename T>

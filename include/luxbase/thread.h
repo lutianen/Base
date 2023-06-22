@@ -68,4 +68,4 @@ namespace base {
         static int numCreated() { return numCreated_.load(); }
     };
 }  // namespace base
-}  // namespace Lux
+}  // namespace lux
