@@ -1,13 +1,39 @@
 /**
- * @brief
+ * @brief Some utils
+ *   - PING PONG
+ *   - toUpper
+ *   - toLower
  */
 
 #pragma once
 
 #include <algorithm>  // toupper
-#include <string>     // string
 #include <chrono>     // chrono
 #include <iostream>   // cout endl
+#include <string>     // string
+
+/// \033[ 表示控制码开始
+#define ESC "\033["
+
+/// \033[0m 关闭所有属性
+#define CLR ESC "0m"
+
+/// \033[01;32m 01表示加粗，31表示红色字体
+/// NOTE Only support `RED "Hello LuxBase" CLR` `REDs("Hello LuxBase")` style
+#define RED ESC "01;31m"
+#define REDs(x) ESC "01;31m" x CLR
+#define GREEN ESC "01;32m"
+#define GREENs(x) ESC "01;32m" x CLR
+#define YELLOW ESC "01;33m"
+#define YELLOWs(x) ESC "01;33m" x CLR
+#define BLUE ESC "01;34m"
+#define BLUEs(x) ESC "01;34m" x CLR
+#define PURPLE ESC "01;35m"
+#define PURPLEs(x) ESC "01;35m" x CLR
+#define DEEPGREEN ESC "01;36m"
+#define DEEPGREENs(x) ESC "01;36m" x CLR
+#define WHITE ESC "01;37m"
+#define WHITEs(x) ESC "01;37m" x CLR
 
 namespace lux {
 namespace base {

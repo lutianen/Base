@@ -1,6 +1,6 @@
 /**
  * @brief File system utilities
- * 
+ *
  */
 
 #pragma once
