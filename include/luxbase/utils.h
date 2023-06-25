@@ -10,6 +10,7 @@
 #include <algorithm>  // toupper
 #include <chrono>     // chrono
 #include <iostream>   // cout endl
+#include <random>     // mt19937
 #include <string>     // string
 
 /// \033[ 表示控制码开始
@@ -38,13 +39,13 @@
 namespace lux {
 namespace base {
 
-/**
- * @brief Simple macro to measure time of execution of a piece of code
- * @usage
- *     PING(CodeToBeMeasured)
- *     CodeToBeMeasure
- *     PONG(CodeToBeMeasured)
- */
+///
+/// @brief Simple macro to measure time of execution of a piece of code
+/// @usage
+///     PING(CodeToBeMeasured)
+///     CodeToBeMeasure
+///     PONG(CodeToBeMeasured)
+///
 #define PING(x) auto bench_##x = std::chrono::steady_clock::now();
 #define PONG(x)                                                             \
     std::cout << #x ": "                                                    \
@@ -58,5 +59,27 @@ namespace base {
 
     /// @brief str to lowercase
     std::string toLower(const std::string& str);
+
+#define seed 42
+    static std::mt19937 __gen(seed);
+    ///
+    /// @brief mt19937 + uniform_distribution (均匀分布)
+    /// @param T - char / short / int / long / uint32_t / float / double
+    /// @par seed is a micro [It can be modified.]
+    /// @usage randomUniform<int>() \n
+    ///        randomUniform<int, 1>() \n
+    ///        randomUniform<int, 1, 100>() \n
+    ///        randomUniform<float, 1, 100>() ...
+    ///
+    template <typename T = uint32_t, int minv = 1, int maxv = 10>
+    inline T randomUniform() {
+        if (std::is_integral_v<T>) {
+            std::uniform_int_distribution<> dist(minv, maxv);
+            return static_cast<T>(dist(__gen));
+        } else if (std::is_floating_point_v<T>) {
+            std::uniform_real_distribution<> dist(minv, maxv);
+            return static_cast<T>(dist(__gen));
+        }
+    };
 }  // namespace base
 }  // namespace lux
