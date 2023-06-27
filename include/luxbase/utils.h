@@ -20,6 +20,14 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
+#if defined(__clang__)
+/// 警告用于检测无意义的比较操作
+#pragma clang diagnostic ignored "-Wtautological-compare"
+#else
+/// 警告用于检测在比较时使用了错误的类型
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
+
 /// \033[ 表示控制码开始
 #define ESC "\033["
 
@@ -42,6 +50,12 @@
 #define DEEPGREENs(x) ESC "01;36m" x CLR
 #define WHITE ESC "01;37m"
 #define WHITEs(x) ESC "01;37m" x CLR
+
+/// __attribute__((used))
+const char digits[] __attribute__((used)) = "9876543210123456789";
+static_assert(sizeof digits == 20, "wrong number of digits");
+const char digitsHex[] = "0123456789ABCDEF";
+static_assert(sizeof digitsHex == 17, "wrong number of digitsHex");
 
 namespace lux {
 namespace base {
@@ -111,6 +125,48 @@ namespace base {
     /// [1.00Mi, 9.99Mi]
     ///
     std::string formatIEC(int64_t s);
+
+    ///
+    /// @brief Efficient Integer to String Conversions, by Matthew Wilson.
+    /// @param buf Dst buffer
+    /// @param value Src integer value
+    /// @return size_t Valid length of buf
+    ///
+    template <typename T>
+    inline size_t integer2Str(char buf[], T value) {
+        T i = value;
+        char* p = buf;
+        const char* zero = digits + 9;
+        do {
+            int lsd = static_cast<int>(i % 10);
+            i /= 10;
+            *p++ = zero[lsd];
+        } while (i != 0);
+        if (value < 0) *p++ = '-';
+        *p = '\0';
+        std::reverse(buf, p);
+        return static_cast<size_t>(p - buf);
+    }
+
+    ///
+    /// @brief Efficient Integer to Hex String Conversions, by Matthew Wilson.
+    ///
+    /// @param buf Dst buffer
+    /// @param value Src integer value
+    /// @return size_t Valid length of buf
+    ///
+    inline size_t integer2StrHex(char buf[], uintptr_t value) {
+        uintptr_t i = value;
+        char* p = buf;
+        do {
+            int lsd = static_cast<int>(i % 16);
+            i /= 16;
+            *p++ = digitsHex[lsd];
+        } while (i != 0);
+        *p = '\0';
+        std::reverse(buf, p);
+        return static_cast<size_t>(p - buf);
+    }
 
 }  // namespace base
 }  // namespace lux

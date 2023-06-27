@@ -88,10 +88,17 @@ int main() {
     }
     std::cout << GREENs("--- double --") << std::endl;
 
-    for (size_t i = 0; i < 1000000000; i+= 900) {
+    for (size_t i = 0; i < 10000; i += 900) {
         std::cout << "SI: " << lux::base::formatSI(i) << std::endl;
-        std::cout << "IEC: " <<lux::base::formatIEC(i) << std::endl;
+        std::cout << "IEC: " << lux::base::formatIEC(i) << std::endl;
     }
+
+    auto buf = new char[20];
+    int v = 9527;
+    int len = lux::base::integer2Str<int>(buf, v);
+    std::cout << "Len = " << len << ", buf = " << buf << std::endl;
+    len = lux::base::integer2StrHex(buf, v);
+    std::cout << "Len = " << len << ", buf = " << buf << std::endl;
 
     return 0;
 }
