@@ -88,5 +88,10 @@ int main() {
     }
     std::cout << GREENs("--- double --") << std::endl;
 
+    for (size_t i = 0; i < 1000000000; i+= 900) {
+        std::cout << "SI: " << lux::base::formatSI(i) << std::endl;
+        std::cout << "IEC: " <<lux::base::formatIEC(i) << std::endl;
+    }
+
     return 0;
 }

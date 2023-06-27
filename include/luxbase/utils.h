@@ -9,9 +9,16 @@
 
 #include <algorithm>  // toupper
 #include <chrono>     // chrono
+#include <cinttypes>  // PRId64
 #include <iostream>   // cout endl
 #include <random>     // mt19937
 #include <string>     // string
+
+/// 启用 C 标准库中一些格式化输出相关的宏定义和函数
+/// PRId64, %zd, %zu, ...
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
 
 /// \033[ 表示控制码开始
 #define ESC "\033["
@@ -62,6 +69,7 @@ namespace base {
 
 #define seed 42
     static std::mt19937 __gen(seed);
+#undef seed
     ///
     /// @brief mt19937 + uniform_distribution (均匀分布)
     /// @param T - char / short / int / long / uint32_t / float / double
@@ -81,5 +89,28 @@ namespace base {
             return static_cast<T>(dist(__gen));
         }
     };
+
+    ///
+    /// @brief Format a number with 5 characters, including SI units.
+    ///   [0,     999]
+    ///   [1.00k, 999k]
+    ///   [1.00M, 999M]
+    ///   [1.00G, 999G]
+    ///   [1.00T, 999T]
+    ///   [1.00P, 999P]
+    ///   [1.00E, inf)
+    ///
+    std::string formatSI(int64_t s);
+
+    ///
+    /// @brief Format a number with 5 characters, including SI units.
+    /// [0, 1023]
+    /// [1.00Ki, 9.99Ki]
+    /// [10.0Ki, 99.9Ki]
+    /// [ 100Ki, 1023Ki]
+    /// [1.00Mi, 9.99Mi]
+    ///
+    std::string formatIEC(int64_t s);
+
 }  // namespace base
 }  // namespace lux
