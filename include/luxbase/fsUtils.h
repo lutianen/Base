@@ -7,6 +7,7 @@
 
 #include <sys/stat.h>  // stat
 
+#include <cstring>  // strerror_r
 #include <fstream>
 #include <string>
 #include <vector>
@@ -69,6 +70,98 @@ namespace base {
         /// @brief Create a directory
         /// @attr S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
         static inline int mkdir(const char* dirname);
+    };
+
+    /// @brief read small file < 64KB
+    class ReadSmallFile {
+        ReadSmallFile(const ReadSmallFile&) = delete;
+        ReadSmallFile(ReadSmallFile&) = delete;
+
+    public:
+        static const int kBufferSize = 64 * 1024;
+
+        // ReadSmallFile(StringArg filename);
+        ReadSmallFile(const std::string& filename);
+        ~ReadSmallFile();
+
+        /// 
+        /// @brief Read the file content, returns errno if error happens.
+        /// 
+        /// @return int errno
+        /// 
+        template <typename String>
+        int readToString(int maxSize, String* content, int64_t* fileSize,
+                         int64_t* modifyTime, int64_t* createTime);
+
+        ///
+        /// @brief Read file to buf_ and set fileSize to size
+        ///
+        /// @param size read size
+        /// @return int errno
+        ///
+        int readToBuffer(int* size);
+
+        const char* buffer() const { return buf_; }
+
+    private:
+        int fd_;
+        int err_;
+        char buf_[kBufferSize];
+    };
+
+    /// @brief read the file content, returns errno if error happens.
+    template <typename String>
+    // int readFile(StringArg filename, int maxSize, String* content,
+    int readFile(const std::string& filename, int maxSize, String* content,
+                 int64_t* fileSize = NULL, int64_t* modifyTime = NULL,
+                 int64_t* createTime = NULL) {
+        ReadSmallFile file(filename);
+        return file.readToString(maxSize, content, fileSize, modifyTime,
+                                 createTime);
+    }
+
+    ///
+    /// @brief Append content to file
+    /// @note Not thread safe
+    ///
+    class AppendFile {
+    public:
+        AppendFile(const AppendFile&) = delete;
+        AppendFile(AppendFile&) = delete;
+
+        // explicit AppendFile(StringArg filename);
+        ///
+        /// @brief fopen 的模式为 ae; 'e' for O_CLOEXEC - 表示以针对 O_CLOEXEC
+        ///             标志的扩展模式打开文件，表示文件在执行 exec
+        ///             系统调用时自动关闭
+        ///
+        explicit AppendFile(const std::string& filename);
+        ~AppendFile();
+
+        ///
+        /// @brief Write logline to fp_
+        ///
+        /// @param logline - 日志内容
+        /// @param len - 日志内容长度
+        ///
+        void append(const char* logline, size_t len);
+
+        void flush();
+
+        off_t writtenBytes() const { return writtenBytes_; }
+
+    private:
+        ///
+        /// @brief Write logline to fp_
+        ///
+        /// @param logline - 日志内容
+        /// @param len - 日志内容长度
+        ///
+        size_t write(const char* logline, size_t len);
+
+        FILE* fp_;                // FILE*
+        char buffer_[64 * 1024];  // 64KB
+        off_t writtenBytes_;      // 已经写入的字节数
     };
 
 }  // namespace base

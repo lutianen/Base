@@ -63,5 +63,51 @@ int main() {
               << std::endl;
 
     ofs << RED "Hello World" CLR << std::endl;
+
+    {
+        std::string result;
+        int64_t size = 0;
+        int err = lux::base::readFile("/proc/self", 1024, &result, &size);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+        if (err != 0) std::cout << strerror(err) << std::endl;
+
+        err = lux::base::readFile("/proc/self", 1024, &result, NULL);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+
+        err = lux::base::readFile("/proc/self/cmdline", 1024, &result, &size);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+
+        err = lux::base::readFile("/dev/null", 1024, &result, &size);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+
+        err = lux::base::readFile("/dev/zero", 1024, &result, &size);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+
+        err = lux::base::readFile("/notexist", 1024, &result, &size);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+
+        err = lux::base::readFile("/dev/zero", 102400, &result, &size);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+
+        err = lux::base::readFile("/dev/zero", 102400, &result, NULL);
+        printf("%d %zd %" PRIu64 "\n", err, result.size(), size);
+    }
+
+    {
+        lux::base::ReadSmallFile file("/tmp/test_append_file");
+        auto size = new int(0);
+        file.readToBuffer(size);
+        std::cout << file.buffer() << std::endl;
+        delete size;
+    }
+
+    {
+        lux::base::AppendFile file("/tmp/test_append_file");
+        std::string str = "Hello World\n";
+        file.append(str.c_str(), str.size());
+        file.flush();
+        std::cout << file.writtenBytes() << std::endl;
+    }
+
     return 0;
 }
