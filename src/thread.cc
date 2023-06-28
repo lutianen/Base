@@ -83,7 +83,7 @@ namespace detail {
             latch_ = nullptr;
 
             Lute::CurrentThread::t_threadName =
-                name_.empty() ? "LuxThread" : name_.c_str();
+                name_.empty() ? "LuteThread" : name_.c_str();
             ::prctl(PR_SET_NAME, Lute::CurrentThread::t_threadName);
 
             try {

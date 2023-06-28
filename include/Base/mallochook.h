@@ -3,7 +3,7 @@
  * https://github.com/sjp38/mallochook/blob/master/mallochook.c
  * @usage
         1. Use hooked:
-            LD_PRELOAD=$(PWD)/LuxUtils.so ./program
+            LD_PRELOAD=$(PWD)/Lute_Base.so ./program
         2. Don't use hooked:
             ./program
  */
