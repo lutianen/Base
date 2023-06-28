@@ -41,14 +41,24 @@ const char* LogLevelName[static_cast<unsigned int>(
                                                 "WARN  ", "ERROR ", "FATAL "};
 constexpr int LogLevelStrLen = sizeof(LogLevelName) / sizeof(LogLevelName[0]);
 
-/// 
+///
 /// @brief Get a string that describes the error code
-/// 
+///
 /// @param savedErrno Error code
 /// @return const char* String that describes the error code
-/// 
+///
 inline const char* strerror_tl(int savedErrno) {
     return ::strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
+}
+
+inline void defaultAsyncOutput(const char* msg, int len) {
+    g_asyncLogger->append(msg, len);
+}
+
+void initLogger(Lute::Logger::LogLevel logLevel) {
+    Lute::Logger::setLogLevel(logLevel);
+    Lute::Logger::setOutput(defaultAsyncOutput);
+    g_asyncLogger->start();
 }
 
 /// NOTE ----------- FixedBuffer -----------

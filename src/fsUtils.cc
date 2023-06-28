@@ -1,17 +1,15 @@
+#include <Base/fsUtils.h>
 #include <dirent.h>  // opendir
 #include <fcntl.h>   // open
-#include <luxbase/fsUtils.h>
-#include <signal.h>     // kill
-#include <sys/types.h>  // DIR
-#include <unistd.h>     // access
+#include <unistd.h>  // access
 
 #include <cassert>  // assert
+#include <csignal>  // kill
 #include <cstring>  // strcmp
 #include <memory>
 #include <string>  // string
 
-using namespace lux;
-using namespace lux::base;
+using namespace Lute;
 
 void FSUtil::listAllFile(std::vector<std::string>& files,
                          const std::string& path, const std::string& subfix) {
@@ -32,14 +30,14 @@ void FSUtil::listAllFile(std::vector<std::string>& files,
         } else if (dp->d_type == DT_REG) /* 普通文件 */ {
             std::string filename(dp->d_name);
             if (subfix.empty()) {
-                files.push_back(path + "/" + filename);
+                files.emplace_back(path + "/" + filename);
             } else {
                 if (filename.size() < subfix.size()) {
                     continue;
                 }
                 if (filename.substr(filename.length() - subfix.size()) ==
                     subfix) {
-                    files.push_back(path + "/" + filename);
+                    files.emplace_back(path + "/" + filename);
                 }
             }
         }
@@ -70,9 +68,9 @@ bool FSUtil::mkdir(const std::string& dirname) {
             *ptr = '\0';
             if (mkdir(path) != 0) break;
         }
-        if (ptr != nullptr)
+        if (ptr != nullptr) {
             break;
-        else if (mkdir(path) != 0)
+        } else if (mkdir(path) != 0)
             break;
         free(path);
         return true;
@@ -245,7 +243,7 @@ int ReadSmallFile::readToString(int maxSize, String* content, int64_t* fileSize,
         content->clear();
 
         if (fileSize) {
-            struct stat statbuf;
+            struct stat statbuf {};
             if (::fstat(fd_, &statbuf) == 0) {
                 if (S_ISREG(statbuf.st_mode)) /* Regular file */ {
                     *fileSize = statbuf.st_size;
@@ -323,6 +321,5 @@ void AppendFile::append(const char* logline, const size_t len) {
 
 void AppendFile::flush() { ::fflush(fp_); }
 
-template int lux::base::readFile(const std::string& filename, int maxSize,
-                      std::string* content, int64_t*, int64_t*, int64_t*);
-
+template int Lute::readFile(const std::string& filename, int maxSize,
+                            std::string* content, int64_t*, int64_t*, int64_t*);

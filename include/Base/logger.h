@@ -413,20 +413,10 @@ T* CheckNotNull(Lute::Logger::SourceFile file, int line, const char* names,
     return ptr;
 }
 
-extern std::shared_ptr<Lute::AsyncLogger> g_asyncLogger;
-inline void defaultAsyncOutput(const char* msg, int len) {
-    g_asyncLogger->append(msg, len);
-}
-
 ///
 /// @brief Initialize logger
 /// @note default log level is INFO
 ///       default output is defaultAsyncOutput
 /// @param logLevel The logLevel to be set
 ///
-inline void initLogger(
-    Lute::Logger::LogLevel logLevel = Lute::Logger::LogLevel::INFO) {
-    Lute::Logger::setLogLevel(logLevel);
-    Lute::Logger::setOutput(defaultAsyncOutput);
-    g_asyncLogger->start();
-}
+void initLogger(Lute::Logger::LogLevel logLevel = Lute::Logger::LogLevel::INFO);

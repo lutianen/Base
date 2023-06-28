@@ -1,20 +1,25 @@
 add_executable(mallochook mallochook_test.cc)
 
-add_executable(pingpong pingpong_test.cc)
-target_link_libraries(pingpong luxbase)
-
 add_executable(MTQueue MTQueue_test.cc)
-target_link_libraries(MTQueue luxbase)
+target_link_libraries(MTQueue Lute_Base)
 
 add_executable(exception exception_test.cc)
-target_link_libraries(exception luxbase)
+target_link_libraries(exception Lute_Base)
 
 add_executable(mutex mutex_test.cc)
-target_link_libraries(mutex luxbase)
+target_link_libraries(mutex Lute_Base)
 
 add_executable(currentThread currentThread_test.cc)
-target_link_libraries(currentThread luxbase)
+target_link_libraries(currentThread Lute_Base)
+
+add_executable(utils utils_test.cc)
+target_link_libraries(utils Lute_Base)
+
+add_executable(fsUtils fsUtils_test.cc)
+target_link_libraries(fsUtils Lute_Base)
+
+add_executable(logger logger_test.cc)
+target_link_libraries(logger Lute_Base)
 
 add_executable(thread thread_test.cc)
-target_link_libraries(thread luxbase)
-
+target_link_libraries(thread Lute_Base pthread)
