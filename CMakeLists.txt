@@ -12,8 +12,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wold-style-cast")
 
+# Set output directories
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Set srcs
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cc include/*.h)
 add_library(Lute_Base SHARED ${srcs})
 target_include_directories(Lute_Base PUBLIC include)
 
-add_subdirectory(test)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_subdirectory(test)
+endif()
