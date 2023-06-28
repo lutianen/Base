@@ -8,6 +8,7 @@
 ///         LOG_WARN << "This is log WARN TEST";
 ///         ...
 ///     };
+/// NOTE 2,580,000 条日志，每条日志 256 字节 (2,580,000 logs, 256 bytes per log)
 ///
 
 #pragma once
@@ -22,9 +23,9 @@
 
 /// NOTE Key Definitions
 /// The prefix of logfile
-#define LOG_FILE_NAME "SYSTEM"
-/// The rollSize of logfile
-#define LOG_FILE_ROLLSIZE 4 * 1024 * 1024
+#define LOG_FILE_NAME "LuteLogger"
+/// The rollSize of logfile - Default ~1GiB
+#define LOG_FILE_ROLLSIZE 1024 * 1024 * 1024
 /// The flush interval of logfile
 #define LOG_FLUSH_INTERVAL 3
 /// Message Delimiter
