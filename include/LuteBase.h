@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Base/any.h>
 #include <Base/MTQueue.h>
+#include <Base/any.h>
+#include <Base/atomic.h>
 #include <Base/condition_variable.h>
 #include <Base/countDownLatch.h>
 #include <Base/currentThread.h>
