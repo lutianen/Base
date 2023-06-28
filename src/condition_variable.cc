@@ -1,8 +1,6 @@
-#include <luxbase/condition_variable.h>
+#include <Base/condition_variable.h>
 
-#include <iostream>
-
-bool lux::base::Condition::waitForSeconds(double seconds) {
+bool Lute::Condition::waitForSeconds(double seconds) {
     /**
      * 在 Linux 系统中，有多种时钟可以用来获取时间信息:
      *      CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_MONOTIC_RAW 等
@@ -15,7 +13,7 @@ bool lux::base::Condition::waitForSeconds(double seconds) {
         CLOCK_MONOTONIC 时钟可能会受到时间调整的影响（例如 NTP 校时），
         CLOCK_MONOTONIC_RAW 时钟则不受影响
      */
-    struct timespec abstime;
+    struct timespec abstime {};
 #ifdef CLOCK_MONOTONIC_RAW
     ::clock_gettime(CLOCK_MONOTONIC_RAW, &abstime);
 #else
@@ -23,7 +21,7 @@ bool lux::base::Condition::waitForSeconds(double seconds) {
 #endif
 
     const int64_t kNanoSecondsPerSecond = 1E9;
-    int64_t nanoseconds = static_cast<int64_t>(seconds * kNanoSecondsPerSecond);
+    auto nanoseconds = static_cast<int64_t>(seconds * kNanoSecondsPerSecond);
 
     abstime.tv_sec += static_cast<time_t>((abstime.tv_nsec + nanoseconds) /
                                           kNanoSecondsPerSecond);

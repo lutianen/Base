@@ -1,16 +1,16 @@
-#include <luxbase/countDownLatch.h>
+#include <Base/countDownLatch.h>
 
-lux::base::CountDownLatch::CountDownLatch(int count)
+Lute::CountDownLatch::CountDownLatch(int count)
     : mutex_(), condition_(mutex_), count_(count) {}
 
-void lux::base::CountDownLatch::wait() {
+void Lute::CountDownLatch::wait() {
     MutexLockGuard lock(mutex_);
     while (count_ > 0) {
         condition_.wait();
     }
 }
 
-void lux::base::CountDownLatch::countDown() {
+void Lute::CountDownLatch::countDown() {
     MutexLockGuard lock(mutex_);
     --count_;
     if (count_ == 0) {
@@ -18,7 +18,7 @@ void lux::base::CountDownLatch::countDown() {
     }
 }
 
-int lux::base::CountDownLatch::getCount() const {
+int Lute::CountDownLatch::getCount() const {
     MutexLockGuard lock(mutex_);
     return count_;
 }

@@ -1,12 +1,12 @@
-#include <luxbase/condition_variable.h>
-#include <luxbase/mutex.h>
-#include <luxbase/thread.h>
-#include <luxbase/utils.h>
+#include <Base/condition_variable.h>
+#include <Base/mutex.h>
+#include <Base/thread.h>
+#include <Base/utils.h>
 
 #include <vector>
 
 using namespace std;
-using namespace lux::base;
+using namespace Lute;
 
 MutexLock g_mutex;
 vector<int> g_vec;
@@ -52,7 +52,6 @@ int main() {
         g_vec.push_back(i);
     }
     PONG(sigleThreadWithoutLock);
-    
 
     PING(sigleThreadWithLock);
     threadFunc();

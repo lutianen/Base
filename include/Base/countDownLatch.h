@@ -17,33 +17,31 @@
 
 #pragma once
 
-#include <luxbase/condition_variable.h>
-#include <luxbase/mutex.h>
+#include <Base/condition_variable.h>
+#include <Base/mutex.h>
 
-namespace lux {
-namespace base {
+namespace Lute {
+class CountDownLatch {
+public:
+    /// non-copyable
+    CountDownLatch(const CountDownLatch&) = delete;
+    CountDownLatch& operator=(CountDownLatch&) = delete;
 
-    class CountDownLatch {
-        CountDownLatch(const CountDownLatch&) = delete;
-        CountDownLatch& operator=(CountDownLatch&) = delete;
+    explicit CountDownLatch(int count);
 
-    private:
-        mutable MutexLock mutex_;
-        Condition condition_ GUARDED_BY(mutex_);
-        int count_ GUARDED_BY(mutex_);
+    /// @brief 使用条件变量等待计数器减到零，然后notify
+    void wait();
 
-    public:
-        explicit CountDownLatch(int count);
+    /// @brief 对计数器进行原子减一操作
+    void countDown();
 
-        /// @brief 使用条件变量等待计数器减到零，然后notify
-        void wait();
+    /// @brief 获取计数器值
+    /// @return int
+    int getCount() const;
 
-        /// @brief 对计数器进行原子减一操作
-        void countDown();
-
-        /// @brief 获取计数器值
-        /// @return int
-        int getCount() const;
-    };
-}  // namespace base
-}  // namespace lux
+private:
+    mutable MutexLock mutex_;
+    Condition condition_ GUARDED_BY(mutex_);
+    int count_ GUARDED_BY(mutex_);
+};
+}  // namespace Lute

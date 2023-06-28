@@ -1,20 +1,18 @@
+#include <Base/currentThread.h>
 #include <cxxabi.h>    // abi
 #include <execinfo.h>  // backtrace backtrace_symbols
-#include <luxbase/currentThread.h>
 
-namespace lux {
-namespace base {
-    namespace CurrentThread {
-        __thread int t_cachedTid = 0;
-        __thread char t_tidString[32];
-        __thread int t_tidStringLength = 6;
-        __thread const char* t_threadName = "unknown";
-        static_assert(std::is_same<int, pid_t>::value, "pid_t should be int");
-    }  // namespace CurrentThread
-}  // namespace base
-}  // namespace lux
+namespace Lute {
+namespace CurrentThread {
+    __thread int t_cachedTid = 0;
+    __thread char t_tidString[32];
+    __thread int t_tidStringLength = 6;
+    __thread const char* t_threadName = "unknown";
+    static_assert(std::is_same<int, pid_t>::value, "pid_t should be int");
+}  // namespace CurrentThread
+}  // namespace Lute
 
-std::string lux::base::CurrentThread::stackTrace(bool demangle) {
+std::string Lute::CurrentThread::stackTrace(bool demangle) {
     std::string stack;
     const int max_frames = 200;
     void* frame[max_frames];

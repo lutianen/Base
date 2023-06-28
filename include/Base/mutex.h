@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <luxbase/currentThread.h>
+#include <Base/currentThread.h>
 #include <pthread.h>
 
 #include <cassert>
@@ -101,131 +101,127 @@ __END_DECLS
     })
 #endif  // CHECK_PTHREAD_RETURN_VALUE
 
-namespace lux {
-namespace base {
+namespace Lute {
+
+/**
+ * phtread 中 mutex 核心函数：创建、销毁、加锁、解锁
+ * pthread_mutex_init
+ * pthread_mutex_destroy
+ * pthread_mutex_lock
+ * pthread_mutex_unlock
+ */
+class CAPABILITY("mutex") MutexLock {
+public:
+    // noncopyable
+    MutexLock(const MutexLock&) = delete;
+    MutexLock& operator=(MutexLock&) = delete;
+
+    /// @brief 互斥量初始化为默认属性
+    MutexLock() : holder_(0) {
+        MCHECK(pthread_mutexattr_init(&mutexAttr_));
+        MCHECK(pthread_mutexattr_settype(&mutexAttr_, PTHREAD_MUTEX_NORMAL));
+        MCHECK(pthread_mutex_init(&mutex_, &mutexAttr_));
+    }
+
+    ~MutexLock() {
+        assert(holder_ == 0);
+        MCHECK(pthread_mutex_destroy(&mutex_));
+    }
+
+    /// @brief must be called when locked, i.e. for assertion
+    /// @return holder_ == CurrentThread::tid()
+    inline bool isLockedByThisThread() const {
+        return holder_ == CurrentThread::tid();
+    }
+
+    inline void assertLocked() const ASSERT_CAPABILITY(this) {
+        assert(isLockedByThisThread());
+    }
 
     /**
-     * phtread 中 mutex 核心函数：创建、销毁、加锁、解锁
-     * pthread_mutex_init
-     * pthread_mutex_destroy
-     * pthread_mutex_lock
-     * pthread_mutex_unlock
+     * @brief internal usage
+     * 仅供 MutexLockGuard 调用
+     * 严禁用户代码调用
      */
-    class CAPABILITY("mutex") MutexLock {
-        /// @brief  mutex attr
-        pthread_mutexattr_t mutexAttr_;
-        /// @brief 互斥量
-        pthread_mutex_t mutex_;
-        /// @brief 持有该互斥量的线程ID pid_t
-        pid_t holder_;
+    inline void lock() ACQUIRE() {
+        // 顺序不能反
+        MCHECK(pthread_mutex_lock(&mutex_));
+        assignHolder();
+    }
 
+    /**
+     * @brief internal usage
+     * 仅供 MutexLockGuard 调用
+     * 严禁用户代码调用
+     */
+    inline void unlock() RELEASE() {
+        unassignHolder();
+        MCHECK(pthread_mutex_unlock(&mutex_));
+    }
+
+    /// @brief get non-const mutex pointer
+    /// 仅供 Condition 调用 严禁用户代码调用
+    /// @return pthread_mutex_t*
+    inline pthread_mutex_t* getPthreadMutex() /* non-const */ {
+        return &mutex_;
+    }
+
+private:
+    /// @brief  mutex attr
+    pthread_mutexattr_t mutexAttr_;
+    /// @brief 互斥量
+    pthread_mutex_t mutex_;
+    /// @brief 持有该互斥量的线程ID pid_t
+    pid_t holder_;
+
+    inline void unassignHolder() { holder_ = 0; }
+    /// @brief 持有该互斥量的线程 ID(tid)
+    inline void assignHolder() { holder_ = CurrentThread::tid(); }
+
+    /// @brief 友员类 - 条件变量
+    friend class Condition;
+
+    class UnassignGuard {
+    public:
         // noncopyable
-        MutexLock(const MutexLock&) = delete;
-        MutexLock& operator=(MutexLock&) = delete;
+        UnassignGuard(const UnassignGuard&) = delete;
+        UnassignGuard& operator=(UnassignGuard&) = delete;
+
+        explicit UnassignGuard(MutexLock& owner) : owner_(owner) {
+            owner_.unassignHolder();
+        }
+
+        ~UnassignGuard() { owner_.assignHolder(); }
 
     private:
-        inline void unassignHolder() { holder_ = 0; }
-        /// @brief 持有该互斥量的线程 ID(tid)
-        inline void assignHolder() { holder_ = CurrentThread::tid(); }
-
-        /// @brief 友员类 - 条件变量
-        friend class Condition;
-
-        class UnassignGuard {
-            // noncopyable
-            UnassignGuard(const UnassignGuard&) = delete;
-            UnassignGuard& operator=(UnassignGuard&) = delete;
-
-        public:
-            explicit UnassignGuard(MutexLock& owner) : owner_(owner) {
-                owner_.unassignHolder();
-            }
-
-            ~UnassignGuard() { owner_.assignHolder(); }
-
-        private:
-            MutexLock& owner_;
-        };
-
-    public:
-        /// @brief 互斥量初始化为默认属性
-        MutexLock() : holder_(0) {
-            MCHECK(pthread_mutexattr_init(&mutexAttr_));
-            MCHECK(
-                pthread_mutexattr_settype(&mutexAttr_, PTHREAD_MUTEX_NORMAL));
-            MCHECK(pthread_mutex_init(&mutex_, &mutexAttr_));
-        }
-
-        ~MutexLock() {
-            assert(holder_ == 0);
-            MCHECK(pthread_mutex_destroy(&mutex_));
-        }
-
-        /// @brief must be called when locked, i.e. for assertion
-        /// @return holder_ == CurrentThread::tid()
-        inline bool isLockedByThisThread() const {
-            return holder_ == CurrentThread::tid();
-        }
-
-        inline void assertLocked() const ASSERT_CAPABILITY(this) {
-            assert(isLockedByThisThread());
-        }
-
-        /**
-         * @brief internal usage
-         * 仅供 MutexLockGuard 调用
-         * 严禁用户代码调用
-         */
-        inline void lock() ACQUIRE() {
-            // 顺序不能反
-            MCHECK(pthread_mutex_lock(&mutex_));
-            assignHolder();
-        }
-
-        /**
-         * @brief internal usage
-         * 仅供 MutexLockGuard 调用
-         * 严禁用户代码调用
-         */
-        inline void unlock() RELEASE() {
-            unassignHolder();
-            MCHECK(pthread_mutex_unlock(&mutex_));
-        }
-
-        /// @brief get non-const mutex pointer
-        /// 仅供 Condition 调用 严禁用户代码调用
-        /// @return pthread_mutex_t*
-        inline pthread_mutex_t* getPthreadMutex() /* non-const */ {
-            return &mutex_;
-        }
+        MutexLock& owner_;
     };
+};
 
-    /**
-     * @brief
-     * Use as a stack variable, eg.
-        int Foo::size() const {
-            MutexLockGuard lock(mutex_);
-            return data_.size();
-        }
-     */
-    class SCOPED_CAPABILITY MutexLockGuard {
-        MutexLockGuard(const MutexLockGuard&) = delete;
-        MutexLockGuard& operator=(MutexLockGuard&) = delete;
+/**
+ * @brief
+ * Use as a stack variable, eg.
+    int Foo::size() const {
+        MutexLockGuard lock(mutex_);
+        return data_.size();
+    }
+ */
+class SCOPED_CAPABILITY MutexLockGuard {
+public:
+    /// non-copyable
+    MutexLockGuard(const MutexLockGuard&) = delete;
+    MutexLockGuard& operator=(MutexLockGuard&) = delete;
 
-    private:
-        MutexLock& mutex_;
+    explicit MutexLockGuard(MutexLock& mutex) ACQUIRE(mutex) : mutex_(mutex) {
+        mutex_.lock();
+    }
+    ~MutexLockGuard() RELEASE() { mutex_.unlock(); }
 
-    public:
-        explicit MutexLockGuard(MutexLock& mutex) ACQUIRE(mutex)
-            : mutex_(mutex) {
-            mutex_.lock();
-        }
+private:
+    MutexLock& mutex_;
+};
 
-        ~MutexLockGuard() RELEASE() { mutex_.unlock(); }
-    };
-
-}  // namespace base
-}  // namespace lux
+}  // namespace Lute
 
 // 防止像下面这样的误用：MutexLockGuard(mutex_)
 // 临时对象不会长时间持有锁，产生的临时对象马上被销毁了，没有锁住临界区

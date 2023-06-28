@@ -32,33 +32,28 @@
 
 #pragma once
 
-#include <luxbase/currentThread.h>
+#include <Base/currentThread.h>
 
 #include <exception>  // exception
 #include <string>
 
-namespace lux {
-namespace base {
+namespace Lute {
+/// @brief 继承于 std::exception
+class Exception : public std::exception {
+public:
+    explicit Exception(std::string what)
+        : message_(std::move(what)), stack_(CurrentThread::stackTrace(false)) {}
+    ~Exception() noexcept override = default;
 
-    /// @brief 继承于 std::exception
-    class Exception : public std::exception {
-    private:
-        std::string message_;
-        std::string stack_;
+    // default copy-ctor and operator= are okay.
+    Exception(const Exception&) = default;
+    Exception& operator=(const Exception&) = default;
 
-    public:
-        Exception(std::string what)
-            : message_(std::move(what)),
-              stack_(CurrentThread::stackTrace(false)) {}
-        ~Exception() noexcept override = default;
+    const char* what() const noexcept override { return message_.c_str(); }
+    const char* stackTrace() const noexcept { return stack_.c_str(); }
 
-        // default copy-ctor and operator= are okay.
-        Exception(const Exception&) = default;
-        Exception& operator=(const Exception&) = default;
-
-        const char* what() const noexcept override { return message_.c_str(); }
-        const char* stackTrace() const noexcept { return stack_.c_str(); }
-    };
-
-}  // namespace base
-}  // namespace lux
+private:
+    std::string message_;
+    std::string stack_;
+};
+}  // namespace Lute

@@ -1,12 +1,12 @@
-#include <luxbase/MTQueue.h>
-#include <luxbase/utils.h>
+#include <Base/MTQueue.h>
+#include <Base/utils.h>
 
 #include <atomic>
 #include <iostream>
 #include <thread>
 
 std::atomic_int count(0);
-lux::base::MTQueue<int> que;
+Lute::MTQueue<int> que;
 
 int main() {
     int c = 0;
