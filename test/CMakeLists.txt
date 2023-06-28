@@ -23,3 +23,6 @@ target_link_libraries(logger Lute_Base)
 
 add_executable(thread thread_test.cc)
 target_link_libraries(thread Lute_Base pthread)
+
+add_executable(any any_test.cc)
+target_link_libraries(any Lute_Base)
