@@ -394,14 +394,14 @@ inline Lute::Logger::LogLevel Lute::Logger::logLevel() { return g_logLevel; }
 #define LOG_SYSERR Lute::Logger(__FILE__, __LINE__, false).stream()
 #define LOG_SYSFATAL Lute::Logger(__FILE__, __LINE__, true).stream()
 
-inline const char* strerror_tl(int savedErrno);
+const char* strerror_tl(int savedErrno);
 
 // Taken from glog/logging.h
 //
 // Check that the input is non NULL.  This very useful in constructor
 // initializer lists.
 #define CHECK_NOTNULL(val) \
-    Lute::CheckNotNull(__FILE__, __LINE__, "'" #val "' Must be non NULL", (val))
+    CheckNotNull(__FILE__, __LINE__, "'" #val "' Must be non NULL", (val))
 
 // A small helper for CHECK_NOTNULL().
 template <typename T>
