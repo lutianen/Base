@@ -308,7 +308,13 @@ void AppendFile::append(const char* logline, const size_t len) {
             int err = ::ferror(fp_);
             if (err) {
                 // NOTE 512 is _POSIX_ERROR_MAX
+
+#if __cplusplus >= 201703L
                 auto buf = std::make_unique<char[]>(512);
+#else
+                std::unique_ptr<char[]> buf(new char[512]);
+#endif
+
                 ::fprintf(stderr, "AppendFile::append() failed %s\n",
                           ::strerror_r(err, buf.get(), 512));
                 break;

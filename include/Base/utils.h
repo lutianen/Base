@@ -14,9 +14,9 @@
 #include <chrono>     // chrono
 #include <cinttypes>  // PRId64
 #include <cstring>
-#include <iostream>   // cout endl
-#include <random>     // mt19937
-#include <string>     // string
+#include <iostream>  // cout endl
+#include <random>    // mt19937
+#include <string>    // string
 
 /// 启用 C 标准库中一些格式化输出相关的宏定义和函数
 /// PRId64, %zd, %zu, ...
@@ -103,10 +103,18 @@ static std::mt19937 __gen(seed);
 ///
 template <typename T = uint32_t, int minv = 1, int maxv = 10>
 inline T randomUniform() {
+#if __cplusplus >= 201703L
     if (std::is_integral_v<T>) {
+#else
+    if (std::is_integral<T>::value) {
+#endif
         std::uniform_int_distribution<> dist(minv, maxv);
         return static_cast<T>(dist(__gen));
+#if __cplusplus >= 201703L
     } else if (std::is_floating_point_v<T>) {
+#else
+    } else if (std::is_floating_point<T>::value) {
+#endif
         std::uniform_real_distribution<> dist(minv, maxv);
         return static_cast<T>(dist(__gen));
     }
