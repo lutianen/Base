@@ -47,7 +47,7 @@ constexpr int LogLevelStrLen = sizeof(LogLevelName) / sizeof(LogLevelName[0]);
 /// @param savedErrno Error code
 /// @return const char* String that describes the error code
 ///
-inline const char* strerror_tl(int savedErrno) {
+const char* strerror_tl(int savedErrno) {
     return ::strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
 }
 

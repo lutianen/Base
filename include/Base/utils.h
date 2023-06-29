@@ -27,9 +27,11 @@
 #if defined(__clang__)
 /// 警告用于检测无意义的比较操作
 #pragma clang diagnostic ignored "-Wtautological-compare"
+#define NOINLINE __attribute__((noinline))
 #else
 /// 警告用于检测在比较时使用了错误的类型
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#define NOINLINE __attribute__((noinline))
 #endif
 
 /// \033[ 表示控制码开始

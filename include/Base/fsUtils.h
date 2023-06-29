@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <sys/stat.h>  // stat
+#include <Base/utils.h>  // NOINLINE
+#include <sys/stat.h>    // stat
 
 #include <cstring>  // strerror_r
 #include <fstream>
@@ -88,8 +89,8 @@ public:
     /// @return int errno
     ///
     template <typename String>
-    int readToString(int maxSize, String* content, int64_t* fileSize,
-                     int64_t* modifyTime, int64_t* createTime);
+    NOINLINE int readToString(int maxSize, String* content, int64_t* fileSize,
+                              int64_t* modifyTime, int64_t* createTime);
 
     ///
     /// @brief Read file to buf_ and set fileSize to size
