@@ -29,3 +29,6 @@ target_link_libraries(any Lute_Base)
 
 add_executable(atomic atomic_test.cc)
 target_link_libraries(atomic Lute_Base)
+
+add_executable(string_view string_view_test.cc)
+target_link_libraries(string_view Lute_Base)
