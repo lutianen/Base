@@ -14,6 +14,7 @@ using namespace Lute;
            STR(x), STR(y))
 
 int main() {
+#if __cplusplus >= 201103 && __cplusplus < 201703
     {
         string_view sv;
         CHECK_STRING_VIEW(sv.size(), 0);
@@ -103,4 +104,7 @@ int main() {
         sv.starts_with(sv2);
         PONG(perf_substr);
     }
+#else
+    cout << "C++17" << endl;
+#endif
 }

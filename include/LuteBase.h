@@ -11,6 +11,7 @@
 #include <Base/logger.h>
 #include <Base/mallochook.h>
 #include <Base/mutex.h>
+#include <Base/string_view.h>
 #include <Base/thread.h>
 #include <Base/timestamp.h>
 #include <Base/utils.h>
