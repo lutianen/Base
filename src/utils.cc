@@ -26,16 +26,16 @@ void Lute::toLower(std::string& str) {
 }
 
 void Lute::trim(std::string& str, const string_view& whitespaceDelimiters) {
-    str.erase(str.find_last_not_of(whitespaceDelimiters) + 1);
-    str.erase(0, str.find_first_not_of(whitespaceDelimiters));
+    str.erase(str.find_last_not_of(whitespaceDelimiters.data()) + 1);
+    str.erase(0, str.find_first_not_of(whitespaceDelimiters.data()));
 }
 
 void Lute::replace(std::string& src, const string_view& target,
                    const string_view& dst) {
     if (!target.empty()) {
         std::size_t pos = 0;
-        while ((pos = src.find(target, pos)) != std::string::npos) {
-            src.replace(pos, target.size(), dst);
+        while ((pos = src.find(target.data(), pos)) != std::string::npos) {
+            src.replace(pos, target.size(), dst.data());
             pos += dst.size();
         }
     }
