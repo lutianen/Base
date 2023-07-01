@@ -6,6 +6,7 @@
 
 #include <cassert>  // assert
 #include <cstring>  // strlen
+#include <ostream>  // ostream
 #include <string>   // string
 
 namespace Lute {
@@ -208,5 +209,15 @@ private:
     size_t len_;
 };
 #endif
-
 }  // namespace Lute
+
+/// @brief operator "" _sv for string_view
+/// @example auto sv = "abc"_sv;
+inline Lute::string_view operator""_sv(const char* str, std::size_t len) {
+    return Lute::string_view(str, len);
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Lute::string_view& sv) {
+    os << sv.data();
+    return os;
+}

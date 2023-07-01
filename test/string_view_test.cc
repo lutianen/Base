@@ -104,7 +104,13 @@ int main() {
         sv.starts_with(sv2);
         PONG(perf_substr);
     }
+    {
+        auto a = "abc"_sv;
+        std::cout << a << std::endl;
+    }
 #else
     cout << "C++17" << endl;
+    auto a = "abc"_sv;
+    std::cout << a << std::endl;
 #endif
 }
