@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <Base/timestamp.h>  // Timestamp
+#include <Base/string_view.h>  // string_view
+#include <Base/timestamp.h>    // Timestamp
 
 #include <algorithm>  // toupper
 #include <cassert>    // assert
@@ -94,6 +95,19 @@ void toUpper(std::string& str);
 std::string toLower(const std::string& str);
 /// @brief transform str to lowercase
 void toLower(std::string& str);
+
+///
+/// @brief Delete the First and Last " \t\n\r\f\v" in `str`.
+///
+void trim(std::string& str,
+          const string_view& whitespaceDelimiters = " \t\n\r\f\v");
+
+///
+/// @brief In src, replace all target with dst
+/// @example std::string str = "LutePolaris";
+///          Lute::replace(str, "is", "RIS"); // LutePolarRIS
+void replace(std::string& src, const string_view& target,
+             const string_view& dst);
 
 #define seed 42
 static std::mt19937 __gen(seed);

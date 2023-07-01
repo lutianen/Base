@@ -94,13 +94,36 @@ int main() {
         std::cout << "SI: " << Lute::formatSI(i) << std::endl;
         std::cout << "IEC: " << Lute::formatIEC(i) << std::endl;
     }
+    {
+        auto buf = new char[20];
+        int v = 9527;
+        int len = Lute::integer2Str<int>(buf, v);
+        std::cout << "Len = " << len << ", buf = " << buf << std::endl;
+        len = Lute::integer2StrHex(buf, v);
+        std::cout << "Len = " << len << ", buf = " << buf << std::endl;
+    }
 
-    auto buf = new char[20];
-    int v = 9527;
-    int len = Lute::integer2Str<int>(buf, v);
-    std::cout << "Len = " << len << ", buf = " << buf << std::endl;
-    len = Lute::integer2StrHex(buf, v);
-    std::cout << "Len = " << len << ", buf = " << buf << std::endl;
+    {
+        std::string str = " 123  ";
+        std::cout << "before trim: " << str << std::endl;
+        Lute::trim(str);
+        std::cout << "after trim: " << str << std::endl;
 
+        str = " \t\n123  \t\n";
+        std::cout << "before trim: " << str << std::endl;
+        Lute::trim(str);
+        std::cout << "after trim: " << str << std::endl;
+
+        str = " \n\t123  \n";
+        std::cout << "before trim: " << str << std::endl;
+        Lute::trim(str);
+        std::cout << "after trim: " << str << std::endl;
+    }
+
+    {
+        std::string str = "LutePolaris";
+        Lute::replace(str, "is", "RIS");
+        std::cout << str << std::endl;
+    }
     return 0;
 }
