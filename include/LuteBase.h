@@ -8,6 +8,7 @@
 #include <Base/currentThread.h>
 #include <Base/exception.h>
 #include <Base/fsUtils.h>
+#include <Base/ini_config.h>
 #include <Base/logger.h>
 #include <Base/mallochook.h>
 #include <Base/mutex.h>
