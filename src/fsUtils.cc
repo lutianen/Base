@@ -103,6 +103,19 @@ bool FSUtil::mkdir(const std::string& dirname) {
 //     return false;
 // }
 
+bool FSUtil::touch(const std::string& filename) {
+    auto file = basename(filename);
+    auto dir = dirname(filename);
+    if (!dir.empty() && !mkdir(dir)) return false;
+
+    /// O_CREAT: 若文件不存在，则创建它
+    int fd = ::open(filename.c_str(), O_CREAT, 0644);
+    if (fd == -1) return false;
+    close(fd);
+
+    return true;
+}
+
 bool FSUtil::isRunningPidfile(const std::string& pidfile) {
     if (lstat(pidfile.c_str()) != 0) return false;
 

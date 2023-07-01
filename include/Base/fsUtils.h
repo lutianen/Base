@@ -24,6 +24,9 @@ public:
     static bool mkdir(const std::string& dirname);
     // static bool mkdir2(const std::string& dirname);
 
+    /// @brief Make a file recursively
+    static bool touch(const std::string& filename);
+
     /// @brief Check file is exist
     static bool isRunningPidfile(const std::string& pidfile);
 

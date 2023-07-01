@@ -25,32 +25,30 @@ int main() {
               << std::endl;
 
     std::cout << Lute::FSUtil::mv("/home/lux/Base/test_mv_file2.txt",
-                                       "/home/lux/Base/test_mv_file.txt")
+                                  "/home/lux/Base/test_mv_file.txt")
               << std::endl;
     std::cout << Lute::FSUtil::mv("/home/lux/Base/test_mv_file.txt",
-                                       "/home/lux/Base/test_mv_file2.txt")
+                                  "/home/lux/Base/test_mv_file2.txt")
               << std::endl;
 
     std::string abspath;
     std::cout << Lute::FSUtil::realpath("./utils", abspath) << std::endl;
     std::cout << abspath << std::endl;
 
-    std::cout << Lute::FSUtil::symlink(
-                     "/home/lux/Base/test_mv_file2.txt",
-                     "/home/lux/Base/test_mv_file3.txt")
+    std::cout << Lute::FSUtil::symlink("/home/lux/Base/test_mv_file2.txt",
+                                       "/home/lux/Base/test_mv_file3.txt")
               << std::endl;
 
     std::cout << Lute::FSUtil::dirname(abspath) << std::endl;
     std::cout << Lute::FSUtil::basename(abspath) << std::endl;
 
     std::ifstream ifs;
-    std::cout << Lute::FSUtil::openForRead(
-                     ifs, "/home/lux/Base/test_mv_file3.txt",
-                     std::ios_base::binary)
+    std::cout << Lute::FSUtil::openForRead(ifs,
+                                           "/home/lux/Base/test_mv_file3.txt",
+                                           std::ios_base::binary)
               << std::endl;
 
-    size_t size =
-        Lute::FSUtil::fileSize("/home/lux/Base/test_mv_file3.txt");
+    size_t size = Lute::FSUtil::fileSize("/home/lux/Base/test_mv_file3.txt");
 
     std::unique_ptr<char[]> buf(new char[size + 1]);
     ifs.getline(buf.get(), size);
@@ -107,6 +105,12 @@ int main() {
         file.append(str.c_str(), str.size());
         file.flush();
         std::cout << file.writtenBytes() << std::endl;
+    }
+
+    {
+        assert(Lute::FSUtil::touch("/home/lux/test_touch/file1") != false);
+        assert(Lute::FSUtil::touch("/home/lux/test_touch/file2") != false);
+        assert(Lute::FSUtil::touch("/home/lux/test_touch/file3") != false);
     }
 
     return 0;
