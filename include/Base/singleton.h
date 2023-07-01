@@ -1,5 +1,5 @@
 ///
-/// @brief Sigleton 模式
+/// @brief Singleton 模式
 ///
 
 #pragma once

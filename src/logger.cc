@@ -1,5 +1,5 @@
 #include <Base/logger.h>
-#include <Base/sigleton.h>
+#include <Base/singleton.h>
 #include <Base/utils.h>
 
 Lute::Logger::LogLevel initLogLevel();  // forward declaration
