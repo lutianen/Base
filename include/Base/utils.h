@@ -85,11 +85,15 @@ namespace Lute {
 /// @param N size_t
 inline void memZero(void* S, size_t N) { ::memset(S, 0, N); }
 
-/// @brief Transform str to uppercase
+/// @brief transform str to uppercase and return a new string
 std::string toUpper(const std::string& str);
+/// @brief transform str to uppercase
+void toUpper(std::string& str);
 
-/// @brief str to lowercase
+/// @brief transform str to lowercase and return a new string
 std::string toLower(const std::string& str);
+/// @brief transform str to lowercase
+void toLower(std::string& str);
 
 #define seed 42
 static std::mt19937 __gen(seed);

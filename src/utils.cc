@@ -12,11 +12,17 @@ std::string Lute::toUpper(const std::string& str) {
     std::transform(rt.begin(), rt.end(), rt.begin(), ::toupper);
     return rt;
 }
+void Lute::toUpper(std::string& str) {
+    std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+}
 
 std::string Lute::toLower(const std::string& str) {
     std::string rt = str;
     std::transform(rt.begin(), rt.end(), rt.begin(), ::tolower);
     return rt;
+}
+void Lute::toLower(std::string& str) {
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
 std::string Lute::formatSI(int64_t s) {
