@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     // LOG_ERROR << "This is log ERROR TEST";
     // LOG_SYSERR << "This is log SYSERR TEST";
 
-    // LOG_INFO << "CurrentThread: " << Lute::CurrentThread::tid();
+    LOG_INFO << "CurrentThread: " << Lute::CurrentThread::tid();
 
     for (size_t i = 0; i < g_threadNum; ++i) {
         threads.push_back(new Lute::Thread([]() {

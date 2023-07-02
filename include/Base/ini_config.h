@@ -16,30 +16,78 @@
 /// #define KEY_UPPER  // *KEY_NOT_CASE_SENSITIVE and TRANSFORM to UPPER
 ///
 /// @example
-///     xxx.cc:
-///         #define INI_FILE_NAME "conf/system.ini"
-///         std::shared_ptr<Lute::ini::INI> g_iniFilePtr =
-///             Lute::SingletonPtr<Lute::ini::INI>::GetInstance(INI_FILE_NAME);
-///         std::shared_ptr<Lute::ini::INIStructure> g_iniContentPtr =
-///             Lute::SingletonPtr<Lute::ini::INIStructure>::GetInstance();
-///         int main() {
-///             Lute::ini::initIniConfig(INI_FILE_NAME);
-///
-///             // Write
-///             INI_WRITE("person", "body", "Lute");
-///             INI_WRITE("money", "RMB", "100");
-///             INI_WRITE("money", "Dollar", "13.87");
-///
-///             // Read
-///             std::cout << INI_READ("person", "body") << std::endl;
-///             std::cout << INI_READ("money", "RMB") << std::endl;
-///             std::cout << INI_READ("money", "Dollar") << std::endl;
-///         }
+/**     xxx.cc:
+         #define INI_FILE_NAME "conf/iniConfigTest.ini"
+
+         #define LUTE_INI
+   Lute::SingletonPtr<Lute::ini::INI>::GetInstance(INI_FILE_NAME)
+         #define LUTE_INI_CONTENT \
+             Lute::SingletonPtr<Lute::ini::INIStructure>::GetInstance()
+
+         #define LUTE_INI_TYPE(x) x##_sv
+         /// Assert that `x` is `Lute::string_view`
+         #ifdef NDEBUG
+         #define LUTE_INI_ASSERT(x) (void)x
+         #else
+         #define LUTE_INI_ASSERT(x)                                            \
+             do {                                                              \
+                 if (!(std::is_same<decltype(x), Lute::string_view>::value)) { \
+                     ::fprintf(stderr,                                         \
+                               "Assertion failed: %s:%d `" #x                  \
+                               "` must be `Lute::string_view`!\n",             \
+                               __FILE__, __LINE__);                            \
+                     ::abort();                                                \
+                 }                                                             \
+             } while (0)
+         #endif
+
+         /// Read section / key
+         #define LUTE_INI_READ(SECTION, KEY)                            \
+             [&]() {                                                    \
+                 LUTE_INI_ASSERT(LUTE_INI_TYPE(SECTION));               \
+                 LUTE_INI_ASSERT(LUTE_INI_TYPE(KEY));                   \
+                 LUTE_INI->read(*LUTE_INI_CONTENT);                     \
+                 return Lute::string_view(                              \
+                     (*LUTE_INI_CONTENT)[LUTE_INI_TYPE(SECTION).data()] \
+                                        [LUTE_INI_TYPE(KEY).data()]);   \
+             }()
+
+         /// Add or Update section / key-value and save
+         #define LUTE_INI_WRITE(SECTION, KEY, VALUE)                 \
+             do {                                                    \
+                 LUTE_INI_ASSERT(LUTE_INI_TYPE(SECTION));            \
+                 LUTE_INI_ASSERT(LUTE_INI_TYPE(KEY));                \
+                 LUTE_INI_ASSERT(LUTE_INI_TYPE(VALUE));              \
+                 (*LUTE_INI_CONTENT)[LUTE_INI_TYPE(SECTION).data()]  \
+                                    [LUTE_INI_TYPE(KEY).data()] =    \
+                                        LUTE_INI_TYPE(VALUE).data(); \
+                 LUTE_INI->write(*LUTE_INI_CONTENT);                 \
+             } while (0)
+
+         namespace Lute {
+         namespace ini {
+             ///
+             /// @brief Initialize ini config file
+             ///
+             inline void initIniConfig(const Lute::string_view& iniFileName) {
+                 if (!Lute::FSUtil::touch(std::string(iniFileName.data())))
+   return; LUTE_INI->generate(*LUTE_INI_CONTENT);
+
+                 if (Lute::FSUtil::fileSize(std::string(iniFileName.data())) ==
+   0) { LUTE_INI_WRITE("persion", "body", "Lute"); LUTE_INI_WRITE("money",
+   "RMB", "100"); LUTE_INI_WRITE("money", "Dollar", "13.87");
+                 }
+             }
+
+         }  // namespace ini
+         }  // namespace Lute
+*/
 ///
 
 #pragma once
 
 #include <Base/fsUtils.h>
+#include <Base/singleton.h>
 #include <Base/string_view.h>
 #include <Base/utils.h>
 #include <sys/stat.h>
@@ -714,47 +762,3 @@ namespace ini {
 
 }  // namespace ini
 }  // namespace Lute
-
-extern std::shared_ptr<Lute::ini::INI> g_iniFilePtr;
-extern std::shared_ptr<Lute::ini::INIStructure> g_iniContentPtr;
-
-namespace Lute {
-namespace ini {
-    ///
-    /// @brief Initialize ini config file
-    ///
-    inline void initIniConfig(const Lute::string_view& iniFileName) {
-        if (!Lute::FSUtil::touch(std::string(iniFileName.data()))) return;
-        g_iniFilePtr->generate(*g_iniContentPtr);
-    }
-}  // namespace ini
-}  // namespace Lute
-
-#define LUTE_INI_ASSERT(x)                                             \
-    static_assert(std::is_same<decltype(x), Lute::string_view>::value, \
-                  #x " must be Lute::string_view")
-
-#define LUTE_INI_TYPE(x) x##_sv
-
-/// Read section / key
-#define LUTE_INI_READ(SECTION, KEY)                           \
-    [&]() {                                                   \
-        LUTE_INI_ASSERT(LUTE_INI_TYPE(SECTION));              \
-        LUTE_INI_ASSERT(LUTE_INI_TYPE(KEY));                  \
-        g_iniFilePtr->read(*g_iniContentPtr);                 \
-        return Lute::string_view(                             \
-            (*g_iniContentPtr)[LUTE_INI_TYPE(SECTION).data()] \
-                              [LUTE_INI_TYPE(KEY).data()]);   \
-    }()
-
-/// Add or Update section / key-value and save
-#define LUTE_INI_WRITE(SECTION, KEY, VALUE)                \
-    do {                                                   \
-        LUTE_INI_ASSERT(LUTE_INI_TYPE(SECTION));           \
-        LUTE_INI_ASSERT(LUTE_INI_TYPE(KEY));               \
-        LUTE_INI_ASSERT(LUTE_INI_TYPE(VALUE));             \
-        (*g_iniContentPtr)[LUTE_INI_TYPE(SECTION).data()]  \
-                          [LUTE_INI_TYPE(KEY).data()] =    \
-                              LUTE_INI_TYPE(VALUE).data(); \
-        g_iniFilePtr->write(*g_iniContentPtr);             \
-    } while (0)
