@@ -21,14 +21,7 @@
 
 #include <memory>  // unique_ptr
 
-/// NOTE Key Definitions
-/// The prefix of logfile
-#define LOG_FILE_NAME "LuteLogger"
-/// The rollSize of logfile - Default ~1GiB
-#define LOG_FILE_ROLLSIZE 1024 * 1024 * 1024
-/// The flush interval of logfile
-#define LOG_FLUSH_INTERVAL 3
-/// Message Delimiter
+/// NOTE Message Delimiter
 constexpr char MsgDelimiter[] = "@ ";
 
 namespace Lute {

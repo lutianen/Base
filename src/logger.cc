@@ -1,8 +1,25 @@
+#include <Base/ini_config.h>
 #include <Base/logger.h>
 #include <Base/singleton.h>
 #include <Base/utils.h>
 
-Lute::Logger::LogLevel initLogLevel();  // forward declaration
+/// *********************************************************
+/// FIXME Must correspond one-to-one with .ini file
+#define INI_FILE "conf/LuteLogger.ini"
+#define LUTE_LOGGER_INI_SECTION "Logger"
+#define LUTE_LOGGER_INI_LOG_FILENAME_KEY "LOG_FILE_NAME"
+#define LUTE_LOGGER_INI_LOG_FILENAME_VALUE_DEFAULT "Lute"
+/// Uint: Byte
+#define LUTE_LOGGER_INI_LOG_FILE_ROLLSIZE_KEY "LOG_FILE_ROLLSIZE"
+#define LUTE_LOGGER_INI_LOG_FILE_ROLLSIZE_VALUE_DEFAULT "1072741824"
+/// Uint: seconds
+#define LUTE_LOGGER_INI_LOG_FLUSH_INTERVAL_KEY "LOG_FLUSH_INTERVAL"
+#define LUTE_LOGGER_INI_LOG_FLUSH_INTERVAL_VALUE_DEFAULT "30"
+/// *********************************************************
+
+// forward declaration
+Lute::Logger::LogLevel initLogLevel();
+std::shared_ptr<Lute::AsyncLogger> g_asyncLogger;
 
 /**
  * @brief Default output Func.
@@ -20,26 +37,120 @@ void defaultOutput(const char* msg, int len) {
         ::perror(_buf);
     }
 }
+inline void defaultAsyncOutput(const char* msg, int len) {
+    g_asyncLogger->append(msg, len);
+}
 void defaultFlush() { ::fflush(stdout); }
 
-auto g_asyncLogger = Lute::SingletonPtr<Lute::AsyncLogger>::GetInstance(
-    LOG_FILE_NAME, LOG_FILE_ROLLSIZE, LOG_FLUSH_INTERVAL);
+/// -----------------------------
+/// NOTE ini config
+#define LUTE_INI Lute::SingletonPtr<Lute::ini::INI>::GetInstance(INI_FILE)
+#define LUTE_INI_CONTENT \
+    Lute::SingletonPtr<Lute::ini::INIStructure>::GetInstance()
+
+#define LUTE_INI_TYPE(x) x##_sv
+/// Assert that `x` is `Lute::string_view`
+#ifdef NDEBUG
+#define LUTE_INI_ASSERT(x) (void)x
+#else
+#define LUTE_INI_ASSERT(x)                                            \
+    do {                                                              \
+        if (!(std::is_same<decltype(x), Lute::string_view>::value)) { \
+            ::fprintf(stderr,                                         \
+                      "Assertion failed: %s:%d `" #x                  \
+                      "` must be `Lute::string_view`!\n",             \
+                      __FILE__, __LINE__);                            \
+            ::abort();                                                \
+        }                                                             \
+    } while (0)
+#endif
+
+/// Read section / key
+#define LUTE_INI_READ(SECTION, KEY)                            \
+    [&]() {                                                    \
+        LUTE_INI_ASSERT(LUTE_INI_TYPE(SECTION));               \
+        LUTE_INI_ASSERT(LUTE_INI_TYPE(KEY));                   \
+        LUTE_INI->read(*LUTE_INI_CONTENT);                     \
+        return Lute::string_view(                              \
+            (*LUTE_INI_CONTENT)[LUTE_INI_TYPE(SECTION).data()] \
+                               [LUTE_INI_TYPE(KEY).data()]);   \
+    }()
+
+/// Add or Update section / key-value and save
+#define LUTE_INI_WRITE(SECTION, KEY, VALUE)                 \
+    do {                                                    \
+        LUTE_INI_ASSERT(LUTE_INI_TYPE(SECTION));            \
+        LUTE_INI_ASSERT(LUTE_INI_TYPE(KEY));                \
+        LUTE_INI_ASSERT(LUTE_INI_TYPE(VALUE));              \
+        (*LUTE_INI_CONTENT)[LUTE_INI_TYPE(SECTION).data()]  \
+                           [LUTE_INI_TYPE(KEY).data()] =    \
+                               LUTE_INI_TYPE(VALUE).data(); \
+        LUTE_INI->write(*LUTE_INI_CONTENT);                 \
+    } while (0)
+
+namespace Lute {
+namespace ini {
+    ///
+    /// @brief Initialize ini config file
+    ///
+    inline void initIniConfig() {
+        if (!Lute::FSUtil::touch(std::string(INI_FILE))) return;
+        LUTE_INI->generate(*LUTE_INI_CONTENT);
+
+        /// FIXME Must correspond one-to-one with macro
+        if (Lute::FSUtil::fileSize(std::string(INI_FILE)) == 0) {
+            LUTE_INI_WRITE(LUTE_LOGGER_INI_SECTION,
+                           LUTE_LOGGER_INI_LOG_FILENAME_KEY,
+                           LUTE_LOGGER_INI_LOG_FILENAME_VALUE_DEFAULT);
+            LUTE_INI_WRITE(LUTE_LOGGER_INI_SECTION,
+                           LUTE_LOGGER_INI_LOG_FILE_ROLLSIZE_KEY,
+                           LUTE_LOGGER_INI_LOG_FILE_ROLLSIZE_VALUE_DEFAULT);
+            LUTE_INI_WRITE(LUTE_LOGGER_INI_SECTION,
+                           LUTE_LOGGER_INI_LOG_FLUSH_INTERVAL_KEY,
+                           LUTE_LOGGER_INI_LOG_FLUSH_INTERVAL_VALUE_DEFAULT);
+        }
+    }
+
+}  // namespace ini
+}  // namespace Lute
+/// -----------------------------
 
 /// NOTE Global Outuput/Flush Function
 Lute::Logger::OutputFunc g_output = defaultOutput;
 Lute::Logger::FlushFunc g_flush = defaultFlush;
+/// NOTE Global logger level is set
+Lute::Logger::LogLevel g_logLevel = initLogLevel();
 
+/// Thread local data
 __thread char t_errnobuf[512];
 __thread char t_time[64];
 __thread time_t t_lastSecond;
-
-/// NOTE Global logger level is set
-Lute::Logger::LogLevel g_logLevel = initLogLevel();
 
 const char* LogLevelName[static_cast<unsigned int>(
     Lute::Logger::LogLevel::NUM_LOG_LEVELS)] = {"TRACE ", "DEBUG ", "INFO  ",
                                                 "WARN  ", "ERROR ", "FATAL "};
 constexpr int LogLevelStrLen = sizeof(LogLevelName) / sizeof(LogLevelName[0]);
+
+///
+/// @brief Init logger
+/// @note It must be called before any other logging function
+///
+void initLogger(Lute::Logger::LogLevel logLevel) {
+    Lute::ini::initIniConfig();
+    static Lute::string_view logFilename = LUTE_INI_READ(
+        LUTE_LOGGER_INI_SECTION, LUTE_LOGGER_INI_LOG_FILENAME_KEY);
+    static Lute::string_view logFileRollsize = LUTE_INI_READ(
+        LUTE_LOGGER_INI_SECTION, LUTE_LOGGER_INI_LOG_FILE_ROLLSIZE_KEY);
+    static Lute::string_view logFlushInterval = LUTE_INI_READ(
+        LUTE_LOGGER_INI_SECTION, LUTE_LOGGER_INI_LOG_FLUSH_INTERVAL_KEY);
+
+    Lute::Logger::setLogLevel(logLevel);
+    g_asyncLogger = Lute::SingletonPtr<Lute::AsyncLogger>::GetInstance(
+        logFilename.data(), ::atoi(logFileRollsize.data()),
+        ::atoi(logFlushInterval.data()));
+    Lute::Logger::setOutput(defaultAsyncOutput);
+    g_asyncLogger->start();
+}
 
 ///
 /// @brief Get a string that describes the error code
@@ -49,16 +160,6 @@ constexpr int LogLevelStrLen = sizeof(LogLevelName) / sizeof(LogLevelName[0]);
 ///
 const char* strerror_tl(int savedErrno) {
     return ::strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
-}
-
-inline void defaultAsyncOutput(const char* msg, int len) {
-    g_asyncLogger->append(msg, len);
-}
-
-void initLogger(Lute::Logger::LogLevel logLevel) {
-    Lute::Logger::setLogLevel(logLevel);
-    Lute::Logger::setOutput(defaultAsyncOutput);
-    g_asyncLogger->start();
 }
 
 /// NOTE ----------- FixedBuffer -----------
