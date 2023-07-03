@@ -38,3 +38,6 @@ target_link_libraries(ini_config Lute_Base)
 
 add_executable(endian endian_test.cc)
 target_link_libraries(endian Lute_Base)
+
+add_executable(bytearray bytearray_test.cc)
+target_link_libraries(bytearray Lute_Base)
