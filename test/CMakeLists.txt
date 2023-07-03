@@ -35,3 +35,6 @@ target_link_libraries(string_view Lute_Base)
 
 add_executable(ini_config ini_config_test.cc)
 target_link_libraries(ini_config Lute_Base)
+
+add_executable(endian endian_test.cc)
+target_link_libraries(endian Lute_Base)

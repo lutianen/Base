@@ -6,6 +6,7 @@
 #include <Base/condition_variable.h>
 #include <Base/countDownLatch.h>
 #include <Base/currentThread.h>
+#include <Base/endian.h>
 #include <Base/exception.h>
 #include <Base/fsUtils.h>
 #include <Base/ini_config.h>
