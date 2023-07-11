@@ -41,3 +41,6 @@ target_link_libraries(endian Lute_Base)
 
 add_executable(bytearray bytearray_test.cc)
 target_link_libraries(bytearray Lute_Base)
+
+add_executable(pinyinParser pinyinParser_test.cc)
+target_link_libraries(pinyinParser Lute_Base)
