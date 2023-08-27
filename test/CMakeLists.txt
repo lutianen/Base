@@ -41,3 +41,6 @@ target_link_libraries(endian Lute_Base)
 
 add_executable(bytearray bytearray_test.cc)
 target_link_libraries(bytearray Lute_Base)
+
+add_executable(md5 md5_unit.cc)
+target_link_libraries(md5 Lute_Base gtest gtest_main)

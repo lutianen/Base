@@ -13,6 +13,7 @@
 #include <Base/ini_config.h>
 #include <Base/logger.h>
 #include <Base/mallochook.h>
+#include <Base/md5.h>
 #include <Base/mutex.h>
 #include <Base/singleton.h>
 #include <Base/string_view.h>
