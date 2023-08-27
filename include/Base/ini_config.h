@@ -341,7 +341,8 @@ namespace ini {
 
             if (!fileReadStream_.is_open()) {
                 const char err[] = "fileReadStream open failed.";
-                ::write(1, err, sizeof(err));
+                int rc = ::write(1, err, sizeof(err));
+                (void)rc;
                 return 0;
             }
             fileReadStream_.seekg(0, std::ios::end);
@@ -362,7 +363,8 @@ namespace ini {
 
             if (!fileReadStream_.is_open()) {
                 const char err[] = "fileReadStream open failed.";
-                ::write(1, err, sizeof(err));
+                int rc = ::write(1, err, sizeof(err));
+                (void)rc;
                 return {};
             }
 
@@ -385,7 +387,8 @@ namespace ini {
 
             if (!fileReadStream_.is_open()) {
                 const char err[] = "fileReadStream open failed.";
-                ::write(1, err, sizeof(err));
+                int rc = ::write(1, err, sizeof(err));
+                (void)rc;
                 return {};
             }
 
@@ -603,7 +606,8 @@ namespace ini {
                                   std::ios::out | std::ios::binary);
             if (!fileWriteStream_.is_open()) {
                 const char err[] = "fileWriteStream open failed.";
-                ::write(1, err, sizeof(err));
+                int rc = ::write(1, err, sizeof(err));
+                (void)rc;
                 return false;
             }
 

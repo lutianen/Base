@@ -18,6 +18,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Set srcs
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS src/*.cc include/*.h)
 add_library(Lute_Base SHARED ${srcs})
+target_link_libraries(Lute_Base PUBLIC pthread)
 target_include_directories(Lute_Base PUBLIC include)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
