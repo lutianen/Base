@@ -1,5 +1,6 @@
 #include <Base/atomic.h>
 #include <assert.h>
+#include <atomic>
 
 int main() {
     {
@@ -32,5 +33,14 @@ int main() {
         assert(a1.addAndGet(-3) == 2);
         assert(a1.getAndSet(100) == 2);
         assert(a1.get() == 100);
+    }
+
+    {
+        std::atomic_int32_t a1(0);
+        Lute::AtomicInt32 a2;
+
+        a2.add(-1); 
+        assert(0 == a1.fetch_add(-1));
+        assert(a2.get() == a1.load());
     }
 }

@@ -110,7 +110,7 @@ namespace md5 {
 
     /**
      * @brief Compute the MD5 HASH of @c input
-     * @param[in] input the target to be computed. 
+     * @param[in] input the target to be computed.
      * @return the HEX string
      */
     std::string md5_hash_hex(std::string const& input);
